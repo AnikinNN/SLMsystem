@@ -47,11 +47,9 @@ class DataExtractor(QtCore.QObject):
         with open(output_file_path, "w") as output_file:
             start_time = datetime.datetime.now().timestamp()
             while self.continue_record:
-                raw_data = [None, None, None]
-                for i in range(2):
-                    self.port.write(("get" + str(i) + "\n").encode())
-                    raw_data[i] = self.port.read_until(expected='\n'.encode()).decode().strip()
-                raw_data[2] = datetime.datetime.now().timestamp() - start_time
+                self.port.write("get\n".encode())
+                raw_data = self.port.read_until(expected='\n'.encode()).decode().strip().split(" ")
+                raw_data.append(datetime.datetime.now().timestamp() - start_time)
 
                 self.obtained_data[0].append(parse_measure(raw_data[0]))
                 self.obtained_data[1].append(parse_measure(raw_data[1]))

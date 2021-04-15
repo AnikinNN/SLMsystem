@@ -8,17 +8,15 @@
 	clk_pin = clk;
 	data_pin = data;
 	req_pin = req;
-	pinMode(clk_pin, INPUT_PULLUP);
-	pinMode(data_pin, INPUT_PULLUP);
+	pinMode(clk_pin, INPUT);
+	pinMode(data_pin, INPUT);
 	pinMode(req_pin, OUTPUT);
-	digitalWrite(req_pin,LOW);       // set request at LOW
+	digitalWrite(req_pin,LOW);
   error = 0;
  }
  
-double Digimatic::fetch()
+void Digimatic::fetch()
 {
-  unsigned long start_time = micros();
-
   // clear rawdata
   for(int i = 0; i < 13; i++ ) {
     rawdata[i] = 0;
@@ -27,6 +25,7 @@ double Digimatic::fetch()
 
   // trigger request
 	digitalWrite(req_pin,HIGH);
+  unsigned int start_time = micros();
   // wait for response on request
   while(true){
     if(digitalRead(clk_pin) == HIGH){
@@ -34,7 +33,7 @@ double Digimatic::fetch()
       }
     if(micros() - start_time > 100000){
       error = 1;
-      Serial.println("Error");
+      //Serial.println("Error");
       break;
     }
   }
@@ -55,14 +54,23 @@ double Digimatic::fetch()
       rawdata[i] = k;
     }
   }
+}
+
+void Digimatic::parse_measure(){
+  unsigned long start_time = micros();
+  
+  fetch();
+
+  start_time = micros() - start_time;
+  looptime_ms = (double)start_time/1000.0;
   
   // calculate value
-  double cur_value = rawdata[5] * 100000 +
-                     rawdata[6] * 10000 +
-                     rawdata[7] * 1000 +
-                     rawdata[8] * 100 +
-                     rawdata[9] * 10 +
-                     rawdata[10];
+  cur_value = rawdata[5] * 100000 +
+              rawdata[6] * 10000 +
+              rawdata[7] * 1000 +
+              rawdata[8] * 100 +
+              rawdata[9] * 10 +
+              rawdata[10];
   // apply decimal point
   for(int i = 0; i < rawdata[11]; i++){
         cur_value /= 10;
@@ -70,20 +78,20 @@ double Digimatic::fetch()
   // apply sign
   if(rawdata[4] == 8)
     cur_value = -cur_value;
-		
-	start_time = micros() - start_time;
-	looptime_ms = (double)start_time/1000.0;
-	
-	return cur_value;
 }
 
-void Digimatic::get_data()
+double Digimatic::get_value(){
+    fetch();
+    parse_measure();
+    return cur_value;
+}
+
+void Digimatic::print_data()
 {
   fetch();
   for(int i = 0; i < 13; i++){
     Serial.print(rawdata[i], HEX);
   }
-  Serial.println();
 }
 
 bool Digimatic::units_mm()

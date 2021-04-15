@@ -2,26 +2,30 @@
 
 // define pins
 #define CLK_PIN 2
-#define REQ_PIN 3
-#define DATA_PIN 6
+#define REQ_PIN 4
+#define DATA_PIN 3
 
 // initialize Digimatic
-Digimatic sensors[] = {Digimatic(CLK_PIN, DATA_PIN, REQ_PIN), 
-                     Digimatic(7, 8, 9)};
+Digimatic sensors[] = {Digimatic(2, 4, 3), 
+                     Digimatic(6, 5, 7)};
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(2000000);
+  Serial.println("ready");
+
 }
 
 void loop()
 {
-  if(Serial.available()){
-    String income = Serial.readString();
+  if(Serial.available() > 3){
+    String income = Serial.readStringUntil('\n');
     income.trim();
     if(income.substring(0,3) == "get"){
-      int sensor_index = income.substring(4).toInt();
-      sensors[sensor_index].get_data();
+      sensors[0].print_data();
+      Serial.print(" ");
+      sensors[1].print_data();
+      Serial.print("\n");
     }
   }
 }
