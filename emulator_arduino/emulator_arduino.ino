@@ -10,8 +10,11 @@ void loop() {
     if(income.substring(0,3) == "get"){
       int sensor_index = income.substring(3).toInt();
       String response = "FFFF" + 
+                        // sign
                         String(sensor_index % 2 << 3) + 
+                        // some int value in length of 6
                         (String)((sensor_index  + 1) * 100000 + millis() % 100000 )+ 
+                        // decimal point
                         "30\n";
       // emulate time for obtain data from indicator
       delay(40);
