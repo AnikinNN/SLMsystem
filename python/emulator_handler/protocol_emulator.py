@@ -187,7 +187,8 @@ class Serial(SerialBase):
             raise PortNotOpenError()
         if len(data) >= 4 and data[:3] == "get".encode():
             time.sleep(0.04)
-            data = "FFFF000" + data[3:].decode().strip() + "55530\n"
+            data = "FFFF000" + "1" + "55530 "
+            data += "FFFF000" + "2" + "55530\n"
             data = to_bytes(data.encode())
             # calculate aprox time that would be used to send the data
             time_used_to_send = 10.0 * len(data) / self._baudrate

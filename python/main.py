@@ -56,7 +56,8 @@ class DataExtractor(QtCore.QObject):
                 self.obtained_data[2].append(raw_data[2])
 
                 # print("{}\t{}\t{}".format(*raw_data))
-                output_file.write("{}\t{}\t{}\n".format(*raw_data))
+                output_file.write("{}\t{}\t{}\t{}\t{}\n".format(*raw_data,
+                                                                parse_measure(raw_data[0]), parse_measure(raw_data[1])))
         self.finished.emit()  # emit the finished signal when the loop is done
 
     def stop_record(self):
@@ -117,8 +118,7 @@ class MainWindow(QtWidgets.QWidget):
 
         self.combo_baudrate = QtWidgets.QComboBox(self)
         self.combo_baudrate.addItems([str(i) for i in serial.Serial.BAUDRATES])
-        self.combo_baudrate.addItem("2000000")
-        self.combo_baudrate.setCurrentIndex(len(serial.Serial.BAUDRATES))
+        self.combo_baudrate.setCurrentIndex(len(serial.Serial.BAUDRATES) - 1)
 
         self.canvas = MplCanvas()
 
