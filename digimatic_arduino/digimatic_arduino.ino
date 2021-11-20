@@ -1,19 +1,13 @@
 #include "Digimatic.h"
 
-// define pins
-#define CLK_PIN 2
-#define REQ_PIN 4
-#define DATA_PIN 3
-
 // initialize Digimatic
-Digimatic sensors[] = {Digimatic(2, 4, 3), 
+Digimatic sensors[] = {Digimatic(2, 3, 4), 
                      Digimatic(6, 5, 7)};
 
 void setup()
 {
-  Serial.begin(2000000);
+  Serial.begin(115200);
   Serial.println("ready");
-
 }
 
 void loop()
