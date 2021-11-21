@@ -1,3 +1,4 @@
+import os
 import sys
 import matplotlib
 import numpy as np
@@ -30,9 +31,15 @@ class DataExtractor(QtCore.QObject):
     def __init__(self, output_dir=None, parent=None):
         QtCore.QObject.__init__(self, parent=parent)
         if output_dir is None:
-            self.output_dir = "Output/Output-"
+            self.output_dir = "../Output/"
         else:
             self.output_dir = output_dir
+
+        try:
+            os.mkdir(self.output_dir)
+        except OSError as error:
+            pass
+
         self.obtained_data = [[], [], []]
         self.continue_record = None
         self.port = None
@@ -43,7 +50,7 @@ class DataExtractor(QtCore.QObject):
     def start_record(self):
         self.obtained_data = [[], [], []]
         self.continue_record = True
-        output_file_path = self.output_dir + datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S") + ".txt"
+        output_file_path = self.output_dir + "Output-" + datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S") + ".txt"
         with open(output_file_path, "w") as output_file:
             start_time = datetime.datetime.now().timestamp()
             while self.continue_record:
