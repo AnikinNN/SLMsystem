@@ -22,7 +22,6 @@ matplotlib.use('Qt5Agg')
 
 
 class DataExtractor(QtCore.QObject):
-
     finished = QtCore.pyqtSignal()
     connected = QtCore.pyqtSignal()
     failed_to_connect = QtCore.pyqtSignal()
@@ -99,7 +98,6 @@ class MplCanvas(FigureCanvas):
 
 
 class MainWindow(QtWidgets.QWidget):
-
     # make a stop and start signals to communicate with the worker in another thread
     stop_recording_signal = QtCore.pyqtSignal()
     start_recording_signal = QtCore.pyqtSignal()
@@ -237,9 +235,11 @@ class MainWindow(QtWidgets.QWidget):
 
 
 def parse_measure(raw_data: str):
+    if raw_data == "0000000000000":
+        return np.nan
     try:
-        value = int(raw_data[5:11]) *\
-                10 ** (-int(raw_data[11])) *\
+        value = int(raw_data[5:11]) * \
+                10 ** (-int(raw_data[11])) * \
                 (-1 if int(raw_data[4]) == 8 else 1)
         return value
     except:

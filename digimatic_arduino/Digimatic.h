@@ -25,6 +25,9 @@ public:
   // array to store data
   byte data[13];
 
+  //array to store bits
+  byte data_buffer[13 * 4];
+
   // pins
 	byte req_pin;
 	byte clk_pin;
