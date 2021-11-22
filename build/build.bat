@@ -1,1 +1,1 @@
-pyinstaller ../python/SLMsystem.py --distpath SLMsystem --workpath build_tmp
+pyinstaller ../python/SLMsystem.py --distpath SLMsystem --workpath build_tmp --noconfirm

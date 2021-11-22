@@ -24,6 +24,7 @@ void Digimatic::fetch()
   int curr_status = 0;
   int prev_status = digitalRead(clk_pin);
   int toggle_counter = 0;
+  int cycle_counter = 0;
   
   clean_data();
 
@@ -33,7 +34,8 @@ void Digimatic::fetch()
   // toggle req_pin to start
   digitalWrite(req_pin, LOW);
 
-  while(millis() - start_time < 110 && toggle_counter < 104){
+  while(millis() - start_time < 1000 && toggle_counter < 104){
+    cycle_counter++;
     curr_status = digitalRead(clk_pin);
     if(curr_status != prev_status){
       digitalWrite(req_pin, HIGH);
@@ -51,14 +53,16 @@ void Digimatic::fetch()
   //validation
   if(toggle_counter != 104){
     //error ocurred
-//    Serial.print(toggle_counter / 8);
-//    Serial.print(" ");
     clean_data();
   } else{
     for(int i = 0; i < 52; i++){
       bitWrite(data[i / 4], i % 4, data_buffer[i]);
     }
   }
+//  Serial.print(cycle_counter);
+//  Serial.print(" ");
+//  Serial.print(toggle_counter / 8);
+//  Serial.print(" ");
 }
 
 void Digimatic::print_data()
@@ -76,4 +80,6 @@ void Digimatic::clean_data(){
       data_buffer[i * 4 + k] = 0;
     }
   }
+
+  
 }
