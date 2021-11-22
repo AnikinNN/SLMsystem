@@ -45,6 +45,7 @@ class DataExtractor(QtCore.QObject):
         self.port_str = None
         self.baudrate = None
         self.disconnect_req = False
+        self.coefficient = 1
 
     def start_record(self):
         self.obtained_data = [[], [], []]
@@ -58,12 +59,12 @@ class DataExtractor(QtCore.QObject):
                 raw_data.append(datetime.datetime.now().timestamp() - start_time)
 
                 self.obtained_data[0].append(parse_measure(raw_data[0]))
-                self.obtained_data[1].append(parse_measure(raw_data[1]))
+                self.obtained_data[1].append(parse_measure(raw_data[1]) * self.coefficient)
                 self.obtained_data[2].append(raw_data[2])
 
                 # print("{}\t{}\t{}".format(*raw_data))
                 output_file.write("{}\t{}\t{}\t{}\t{}\n".format(*raw_data,
-                                                                parse_measure(raw_data[0]), parse_measure(raw_data[1])))
+                                                                parse_measure(raw_data[0]), parse_measure(raw_data[1]) * self.coefficient))
         self.finished.emit()  # emit the finished signal when the loop is done
 
     def stop_record(self):
@@ -130,7 +131,6 @@ class MainWindow(QtWidgets.QWidget):
         self.coefficient_line_edit = QtWidgets.QLineEdit()
         self.coefficient_line_edit.setText("1.2")
         self.coefficient = None
-        self.set_coefficient()
 
         self.coefficient_label = QtWidgets.QLabel()
         self.coefficient_label.setText("Coefficient")
@@ -177,6 +177,8 @@ class MainWindow(QtWidgets.QWidget):
         self.timer.timeout.connect(self.update_plot)
         self.timer.start()
 
+        self.set_coefficient()
+
     def btn_connection_action(self):
         if self.btn_connection.text() == "Connect":
             self.worker.port_str = self.combo_ports.currentText()
@@ -211,6 +213,7 @@ class MainWindow(QtWidgets.QWidget):
     def set_coefficient(self):
         try:
             self.coefficient = float(self.coefficient_line_edit.text())
+            self.worker.coefficient = self.coefficient
             return True
         except ValueError:
             message = "{} could not convert to float".format(self.coefficient_line_edit.text())
@@ -224,7 +227,7 @@ class MainWindow(QtWidgets.QWidget):
                 self.canvas.axes.grid()
 
             # set new data to display
-            self.canvas.axes.lines[0].set_xdata([i * self.coefficient for i in self.worker.obtained_data[0][:-1]])
+            self.canvas.axes.lines[0].set_xdata(self.worker.obtained_data[0][:-1])
             self.canvas.axes.lines[0].set_ydata(self.worker.obtained_data[1][:-1])
             # recompute limits of axes
             self.canvas.axes.relim()
